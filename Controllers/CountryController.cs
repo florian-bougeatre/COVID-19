@@ -4,20 +4,54 @@ using System.Data;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Script.Serialization;
 using COVID_19.DAL;
 using COVID_19.Models;
+using Newtonsoft.Json;
 
 namespace COVID_19.Controllers
 {
     public class CountryController : Controller
     {
+        private string baseURL = "https://api.covid19api.com/";
         private CovidContext db = new CovidContext();
 
         // GET: Country
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
+            var contries = new List<Country>();
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(baseURL);
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                var res = await client.GetAsync("countries");
+                if (res.IsSuccessStatusCode)
+                {
+                    var countResponse = res.Content.ReadAsStringAsync().Result;
+                    var list = new List<Country>();
+                    var jsonObj = new JavaScriptSerializer().Deserialize<List<Dictionary<string, string>>>(countResponse);
+                    foreach (var item in jsonObj)
+                    {
+                        var code = item["ISO2"].ToCharArray();
+                        var name = item["Country"];
+                        var slug = item["Slug"];
+
+                        if (ModelState.IsValid)
+                        {
+                            /*db.Countries.Add();
+                            db.SaveChanges();*/
+                            list.Add(new Country{Code = code, Slug = slug, Name = name });
+                        }
+                    }
+                    return View(list);
+                }
+            }
             return View(db.Countries.ToList());
         }
 
@@ -47,7 +81,7 @@ namespace COVID_19.Controllers
         // plus de détails, consultez https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "ID,Name,Slug")] Country country)
+        public ActionResult Create([Bind(Include = "Code,Name,Slug")] Country country)
         {
             if (ModelState.IsValid)
             {
