@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
+using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -33,23 +35,28 @@ namespace COVID_19.Controllers
                 var res = await client.GetAsync("countries");
                 if (res.IsSuccessStatusCode)
                 {
+                    var l = db.Countries.ToList<Country>();
                     var countResponse = res.Content.ReadAsStringAsync().Result;
                     var list = new List<Country>();
                     var jsonObj = new JavaScriptSerializer().Deserialize<List<Dictionary<string, string>>>(countResponse);
                     foreach (var item in jsonObj)
                     {
-                        var code = item["ISO2"].ToCharArray();
-                        var name = item["Country"];
-                        var slug = item["Slug"];
 
                         if (ModelState.IsValid)
                         {
-                            /*db.Countries.Add();
-                            db.SaveChanges();*/
-                            list.Add(new Country{Code = code, Slug = slug, Name = name });
+                            var code = item["ISO2"];
+                            var name = item["Country"];
+                            var slug = item["Slug"];
+                            var coun = new Country {Slug = slug, Name = name, Code = code };
+                            list.Add(coun);
+                            var r = db.Countries.SqlQuery("SELECT * FROM countries WHERE Code=@code", new SqlParameter("@code", code)).ToList<Country>();
+                            if (r.Count == 0)
+                            {
+                                db.Countries.Add(coun);
+                                db.SaveChanges();
+                            }
                         }
                     }
-                    return View(list);
                 }
             }
             return View(db.Countries.ToList());
@@ -113,7 +120,7 @@ namespace COVID_19.Controllers
         // plus de détails, consultez https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "ID,Name,Slug")] Country country)
+        public ActionResult Edit([Bind(Include = "ID,Code,Name,Slug")] Country country)
         {
             if (ModelState.IsValid)
             {
