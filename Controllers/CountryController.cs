@@ -49,8 +49,8 @@ namespace COVID_19.Controllers
                             var slug = item["Slug"];
                             var coun = new Country {Slug = slug, Name = name, Code = code };
                             list.Add(coun);
-                            var r = db.Countries.SqlQuery("SELECT * FROM countries WHERE Code=@code", new SqlParameter("@code", code)).ToList<Country>();
-                            if (r.Count == 0)
+                            /*var r = db.Countries.SqlQuery("SELECT * FROM countries WHERE Code=@code", new SqlParameter("@code", code)).ToList<Country>();*/
+                            if (/*r.Count == 0*/ true)
                             {
                                 db.Countries.Add(coun);
                                 db.SaveChanges();

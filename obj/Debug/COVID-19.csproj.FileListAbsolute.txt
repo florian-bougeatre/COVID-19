@@ -89,3 +89,4 @@ D:\ProjetsVS\COVID-19\obj\Debug\COVID-19.csproj.CoreCompileInputs.cache
 D:\ProjetsVS\COVID-19\obj\Debug\COVID-19.csproj.CopyComplete
 D:\ProjetsVS\COVID-19\obj\Debug\COVID-19.dll
 D:\ProjetsVS\COVID-19\obj\Debug\COVID-19.pdb
+D:\ProjetsVS\COVID-19\obj\Debug\COVID-19.csprojAssemblyReference.cache
