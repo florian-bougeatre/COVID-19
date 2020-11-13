@@ -20,40 +20,45 @@ namespace COVID_19.Controllers
 {
     public class CountryController : Controller
     {
+        private DateTime lastUpdate = DateTime.MinValue;
         private string baseURL = "https://api.covid19api.com/";
         private CovidContext db = new CovidContext();
 
         // GET: Country
         public async Task<ActionResult> Index()
         {
-            var contries = new List<Country>();
-            using (var client = new HttpClient())
+            if (DateTime.Now.Subtract(lastUpdate).TotalHours >= 1)
             {
-                client.BaseAddress = new Uri(baseURL);
-                client.DefaultRequestHeaders.Clear();
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                var res = await client.GetAsync("countries");
-                if (res.IsSuccessStatusCode)
+                lastUpdate = DateTime.Now;
+                var contries = new List<Country>();
+                using (var client = new HttpClient())
                 {
-                    var l = db.Countries.ToList<Country>();
-                    var countResponse = res.Content.ReadAsStringAsync().Result;
-                    var list = new List<Country>();
-                    var jsonObj = new JavaScriptSerializer().Deserialize<List<Dictionary<string, string>>>(countResponse);
-                    foreach (var item in jsonObj)
+                    client.BaseAddress = new Uri(baseURL);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var res = await client.GetAsync("countries");
+                    if (res.IsSuccessStatusCode)
                     {
-
-                        if (ModelState.IsValid)
+                        var countResponse = res.Content.ReadAsStringAsync().Result;
+                        var jsonObj = new JavaScriptSerializer().Deserialize<List<Dictionary<string, string>>>(countResponse);
+                        foreach (var item in jsonObj)
                         {
-                            var code = item["ISO2"];
-                            var name = item["Country"];
-                            var slug = item["Slug"];
-                            var coun = new Country {Slug = slug, Name = name, Code = code };
-                            list.Add(coun);
-                            /*var r = db.Countries.SqlQuery("SELECT * FROM countries WHERE Code=@code", new SqlParameter("@code", code)).ToList<Country>();*/
-                            if (/*r.Count == 0*/ true)
+
+                            if (ModelState.IsValid)
                             {
-                                db.Countries.Add(coun);
-                                db.SaveChanges();
+                                try
+                                {
+                                    var code = item["ISO2"];
+                                    var name = item["Country"];
+                                    var slug = item["Slug"];
+                                    var coun = new Country { Slug = slug, Name = name, Code = code };
+                                    db.Countries.Add(coun);
+                                    db.SaveChanges();
+                                }
+                                catch (Exception _e)
+                                {
+                                    Debug.WriteLine(_e);
+                                }
                             }
                         }
                     }
