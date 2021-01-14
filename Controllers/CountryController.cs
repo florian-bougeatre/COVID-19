@@ -47,7 +47,7 @@ namespace COVID_19.Controllers
         // plus de détails, consultez https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "ID,Name,Slug")] Country country)
+        public ActionResult Create([Bind(Include = "ID,Code,Name")] Country country)
         {
             if (ModelState.IsValid)
             {
@@ -79,7 +79,7 @@ namespace COVID_19.Controllers
         // plus de détails, consultez https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "ID,Name,Slug")] Country country)
+        public ActionResult Edit([Bind(Include = "ID,Code,Name")] Country country)
         {
             if (ModelState.IsValid)
             {

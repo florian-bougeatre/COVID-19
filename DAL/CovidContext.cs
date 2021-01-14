@@ -13,7 +13,7 @@ namespace COVID_19.DAL
 
         public DbSet<Case> Cases { get; set; }
 
-        public CovidContext() : base("SchoolContext")
+        public CovidContext() : base("CovidContext")
         {
         }
     }
