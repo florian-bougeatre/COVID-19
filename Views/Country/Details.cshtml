@@ -26,6 +26,47 @@
             @Html.DisplayFor(model => model.Name)
         </dd>
 
+        <dt>
+            @Html.DisplayNameFor(model => model.Cases)
+        </dt>
+
+        <dd>
+            <table class="table">
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Cases.ElementAt(0).Date)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Cases.ElementAt(0).Confirmed)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Cases.ElementAt(0).Deaths)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Cases.ElementAt(0).Recovered)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Cases.ElementAt(0).Active)
+                    </th>
+                    <th></th>
+                </tr>
+                @foreach (var item in Model.Cases.OrderByDescending(model => model.Date))
+                {
+                    <tr>
+                        <td>@Html.DisplayFor(model => item.Date)</td>
+                        <td>@Html.DisplayFor(model => item.Confirmed)</td>
+                        <td>@Html.DisplayFor(model => item.Deaths)</td>
+                        <td>@Html.DisplayFor(model => item.Recovered)</td>
+                        <td>@Html.DisplayFor(model => item.Active)</td>
+                        <td>
+                            @Html.ActionLink("Edit", "../Case/Edit", new { id = item.ID }) |
+                            @Html.ActionLink("Details", "../Case/Details", new { id = item.ID }) |
+                            @Html.ActionLink("Delete", "../Case/Delete", new { id = item.ID })
+                        </td>
+                    </tr>
+                }
+            </table>
+        </dd>
     </dl>
 </div>
 <p>

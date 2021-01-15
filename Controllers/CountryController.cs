@@ -23,9 +23,31 @@ namespace COVID_19.Controllers
         private CovidContext db = new CovidContext();
 
         // GET: Country
-        public ActionResult Index()
+        public ActionResult Index(String sortOrder, string searchString)
         {
-            return View(db.Countries.ToList());
+            ViewBag.CodeSortParm = sortOrder == "Code" ? "code_desc" : "Code";
+            ViewBag.NameSortParm = sortOrder == "Name" ? "name_desc" : "Name";
+            var countries = from s in db.Countries select s;
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                countries = countries.Where(s => s.Name.Contains(searchString) || s.Code.Contains(searchString));
+            }
+            switch (sortOrder)
+            {
+                case "code_desc":
+                    countries = countries.OrderByDescending(s => s.Code);
+                    break;
+                case "Name":
+                    countries = countries.OrderBy(s => s.Name);
+                    break;
+                case "name_desc":
+                    countries = countries.OrderByDescending(s => s.Name);
+                    break;
+                default:
+                    countries = countries.OrderBy(s => s.Code);
+                    break;
+            }
+            return View(countries.ToList());
         }
 
         // GET: Country/Details/5
