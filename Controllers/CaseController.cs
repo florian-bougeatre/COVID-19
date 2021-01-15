@@ -16,9 +16,58 @@ namespace COVID_19.Controllers
         private CovidContext db = new CovidContext();
 
         // GET: Case
-        public ActionResult Index()
+        public ActionResult Index(String sortOrder, string searchString)
         {
-            var cases = db.Cases.Include(@c => @c.Country);
+            ViewBag.NameSortParm = sortOrder == "Name" ? "name_desc" : "Name";
+            ViewBag.DateSortParm = sortOrder == "Date" ? "date_desc" : "Date";
+            ViewBag.ConfirmedSortParm = sortOrder == "Confirmed" ? "confirmed_desc" : "Confirmed";
+            ViewBag.DeathsSortParm = sortOrder == "Deaths" ? "deaths_desc" : "Deaths";
+            ViewBag.RecoveredSortParm = sortOrder == "Recovered" ? "recovered_desc" : "Recovered";
+            ViewBag.ActiveSortParm = sortOrder == "Active" ? "active_desc" : "Active";
+            var cases = from s in db.Cases select s;
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                cases = cases.Where(s => s.Country.Name.Contains(searchString));
+            }
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    cases = cases.OrderByDescending(s => s.Country.Name);
+                    break;
+                case "Date":
+                    cases = cases.OrderBy(s => s.Date);
+                    break;
+                case "Date_desc":
+                    cases = cases.OrderByDescending(s => s.Date);
+                    break;
+                case "Confirmed":
+                    cases = cases.OrderBy(s => s.Confirmed);
+                    break;
+                case "confirmed_desc":
+                    cases = cases.OrderByDescending(s => s.Confirmed);
+                    break;
+                case "Deaths":
+                    cases = cases.OrderBy(s => s.Deaths);
+                    break;
+                case "deaths_desc":
+                    cases = cases.OrderByDescending(s => s.Deaths);
+                    break;
+                case "Recovered":
+                    cases = cases.OrderBy(s => s.Recovered);
+                    break;
+                case "recovered_desc":
+                    cases = cases.OrderByDescending(s => s.Recovered);
+                    break;
+                case "Active":
+                    cases = cases.OrderBy(s => s.Active);
+                    break;
+                case "active_desc":
+                    cases = cases.OrderByDescending(s => s.Active);
+                    break;
+                default:
+                    cases = cases.OrderBy(s => s.Country.Name);
+                    break;
+            }
             return View(cases.ToList());
         }
 
